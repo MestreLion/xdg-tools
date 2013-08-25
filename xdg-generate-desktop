@@ -79,11 +79,10 @@ DESKTOP
 cat > "$dir"/"$exec".install <<INSTALL
 #!/bin/sh
 cd "\$(dirname "\$(readlink -f "\$0")")"
-xdg-desktop-menu install --novendor "$dir/$exec.desktop"
-for icon in "$dir"/"$exec"*.png ; do
+xdg-desktop-menu install --novendor "./$exec.desktop"
+for icon in ./"$exec"*.png ; do
 	size=\$(identify -format '%w' "\$icon")
-	xdg-icon-resource install --noupdate --novendor \
-		--size "\$size" "\$icon" "$exec"
+	xdg-icon-resource install --noupdate --novendor --size "\$size" "\$icon" "$exec"
 done
 xdg-icon-resource forceupdate
 INSTALL
