@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fatal() { [ -n "$1" ] && printf "error: %s\nUse %s --help for usage.\n" "$1" "${0##*/}" >&2; exit 1; }
+fatal() { [[ -n "$1" ]] && printf "error: %s\nUse %s --help for usage.\n" "$1" "${0##*/}" >&2; exit 1; }
 usage() {
 cat <<USAGE
 Usage: ${0##*/} [-h] [-d DIR] BASENAME
@@ -35,14 +35,14 @@ for arg in "$@"; do case "$arg" in -h|--help) usage; exit;; esac; done
 
 while [ $# -gt 0 ]; do
 	case "$1" in
-	-d) shift; [ -n "$1" ] || fatal "missing DIR argument for option"; dir="$1";;
+	-d) shift; [[ -n "$1" ]] || fatal "missing DIR argument for option"; dir="$1";;
 	-*) fatal "invalid option: $1";;
-	*) [ -z "$exec" ] || fatal "too many arguments: $1"; exec="$1";;
+	*) [[ -z "$exec" ]] || fatal "too many arguments: $1"; exec="$1";;
 	esac
 	shift
 done
 
-[ -n "$exec" ] || fatal "missing BASENAME argument"
+[[ -n "$exec" ]] || fatal "missing BASENAME argument"
 
 exit
 
