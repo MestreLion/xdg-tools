@@ -44,12 +44,47 @@ done
 
 [[ -n "$exec" ]] || fatal "missing BASENAME argument"
 
-exit
+echo "Please select the window clicking the mouse in it."
+wid=$(xwininfo | grep 'xwininfo:' | grep -Eo '0x[0-9a-f]+')
 
+[[ -n "$wid" ]] || fatal "could identify window"
 
-xprop -notype 32c _NET_WM_ICON |
+name=$(xprop -id "$wid" -notype WM_NAME | cut -d'"' -f2)
+wmclass=$(xprop -id "$wid" -notype WM_CLASS | cut -d'"' -f2)
+
+xprop -id "$wid" -notype 32c _NET_WM_ICON |
 perl -0777 -pe '@_=/\d+/g;
 	printf "P7\nWIDTH %d\nHEIGHT %d\nDEPTH 4\nMAXVAL 255\nTUPLTYPE RGB_ALPHA\nENDHDR\n", splice@_,0,2;
 	$_=pack "N*", @_;
 	s/(.)(...)/$2$1/gs' |
-convert - icon.png
+convert - "$dir"/"$exec".png
+
+cat > "$dir"/"$exec".desktop <<-DESKTOP
+	[Desktop Entry]
+	Version=1.0
+	Type=Application
+	Name=$name
+	#GenericName=
+	#Comment=
+	# See http://standards.freedesktop.org/menu-spec/latest/apa.html
+	#Categories=;
+	#MimeType=;
+	Terminal=false
+	StartupNotify=true
+	StartupWMClass=$wmclass
+	Icon=$exec
+	Exec=$exec %U
+DESKTOP
+
+cat > "$dir"/"$exec".install <<INSTALL
+#!/bin/sh
+cd "\$(dirname "\$(readlink -f "\$0")")"
+xdg-desktop-menu install --novendor "$dir/$exec.desktop"
+for icon in "$dir"/"$exec"*.png ; do
+	size=\$(identify -format '%w' "\$icon")
+	xdg-icon-resource install --noupdate --novendor \
+		--size "\$size" "\$icon" "$exec"
+done
+xdg-icon-resource forceupdate
+INSTALL
+chmod +x "$dir"/"$exec".install
