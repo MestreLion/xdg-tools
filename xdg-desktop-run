@@ -16,6 +16,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
+"""Run a .desktop file, executing its application"""
+
 import sys
 from gi.repository import Gio
 
@@ -23,12 +25,11 @@ if __name__ == "__main__":
 
 	try:
 		desktop = sys.argv[1]
+		uris = sys.argv[2:]
 	except:
 		sys.stderr.write("Missing DESKTOP-FILE argument.\n"
-		                 "Usage: xdg-desktop-run DESKTOP-FILE\n")
+			"Usage: xdg-desktop-run DESKTOP-FILE [ARGS...]\n")
 		sys.exit(1)
 
-	sys.exit(Gio.DesktopAppInfo.new_from_filename(desktop).launch([], None))
-
-#import xdg.BaseDirectory as xdg
-#xdg.load_data_paths(osp.join('applications', '*.desktop'))
+	sys.exit(Gio.DesktopAppInfo.new_from_filename(desktop).launch_uris(
+		uris, None))
