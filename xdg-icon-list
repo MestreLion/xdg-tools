@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import sys
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 theme = Gtk.IconTheme.get_default()
 for icon in sorted(theme.list_icons(None)):
