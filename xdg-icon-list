@@ -3,6 +3,23 @@ import sys
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+
+def usage(ok=True):
+	sys.stderr.write("Usage: xdg-icon-list [ICONPREFIX]\n")
+	sys.exit(0 if ok else 1)
+
+if len(sys.argv) > 2:
+	usage(False)
+
+try:
+	name = sys.argv[1]
+except:
+	name = None
+
+if name in ('-h', '--help'):
+	usage()
+
 theme = Gtk.IconTheme.get_default()
 for icon in sorted(theme.list_icons(None)):
-	print icon
+	if not name or icon.startswith(name):
+		print icon
