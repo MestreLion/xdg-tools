@@ -19,7 +19,7 @@
 
 if [[ "$1" == '--help' ]]; then
 	echo "Show information or extract a window's icons to NAME-WIDTH.png"
-	echo "Usage: ${0##*/} [NAME]"
+	echo "Usage: ${0##*/} [NAME] [WINDOW_ID]"
 	exit
 fi
 
@@ -29,8 +29,14 @@ else
 	cmd=(identify -)
 fi
 
+if [[ "$2" ]]; then
+	wid=(-id "$2")
+else
+	wid=()
+fi
+
 split_icons() {
-	xprop -notype 32c _NET_WM_ICON |
+	xprop "${wid[@]}" -notype 32c _NET_WM_ICON |
 	awk -v RS=', | = ' -v RT='' '
 		NR == 1         { h  = $1; i++; next }
 		NR == i + 1     { x  = $1;        printf "%s = %s", h, x; next }
