@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# xdg-extract-icons - Extract icons from an X11 window
+#
+#    Copyright (C) 2020 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program. See <http://www.gnu.org/licenses/gpl.html>
+
+if [[ "$1" == '--help' ]]; then
+	echo "Show information or extract a window's icons to NAME-WIDTH.png"
+	echo "Usage: ${0##*/} [NAME]"
+	exit
+fi
+
+if [[ "$1" ]]; then
+	cmd=(convert -set 'filename:w' '%w' - "${1}-%[filename:w].png")
+else
+	cmd=(identify -)
+fi
+
+split_icons() {
+	xprop -notype 32c _NET_WM_ICON |
+	awk -v RS=', | = ' -v RT='' '
+		NR == 1         { h  = $1; i++; next }
+		NR == i + 1     { x  = $1;        printf "%s = %s", h, x; next }
+		NR == i + 2     { s  = x * $1 } { printf ", %s", $1 }
+		NR == i + 2 + s { i += s + 2;     printf "\n" }
+	'
+}
+
+to_pam() {
+	perl -0777 -pe '@_=/\d+/g;
+	printf "P7\nWIDTH %d\nHEIGHT %d\n", splice@_,0,2;
+	printf "DEPTH 4\nMAXVAL 255\nTUPLTYPE RGB_ALPHA\nENDHDR\n";
+	$_=pack "N*", @_;
+	s/(.)(...)/$2$1/gs'
+}
+
+while read -r data; do to_pam <<< "$data" | "${cmd[@]}"; done < <(split_icons)
