@@ -16,6 +16,9 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
+#
+# perl snippet by Stéphane Chazelas <https://unix.stackexchange.com/users/22565>
+# https://unix.stackexchange.com/a/609751/4919
 
 if [[ "$1" == '--help' ]]; then
 	echo "Show information or extract a window's icons to NAME-WIDTH.png"
@@ -37,7 +40,7 @@ fi
 
 split_icons() {
 	xprop "${wid[@]}" -notype 32c _NET_WM_ICON |
-	awk -v RS=', | = ' -v RT='' '
+	awk -v RS=', | = ' '
 		NR == 1         { h  = $1; i++; next }
 		NR == i + 1     { x  = $1;        printf "%s = %s", h, x; next }
 		NR == i + 2     { s  = x * $1 } { printf ", %s", $1 }
