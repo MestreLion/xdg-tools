@@ -73,12 +73,27 @@ wid=$(xwininfo | grep 'xwininfo:' | grep -Eo '0x[0-9a-f]+')
 name=$(xprop -id "$wid" -notype WM_NAME | cut -d'"' -f2)
 wmclass=$(xprop -id "$wid" -notype WM_CLASS | cut -d'"' -f2)
 
-xprop -id "$wid" -notype 32c _NET_WM_ICON |
-perl -0777 -pe '@_=/\d+/g;
-	printf "P7\nWIDTH %d\nHEIGHT %d\nDEPTH 4\nMAXVAL 255\nTUPLTYPE RGB_ALPHA\nENDHDR\n", splice@_,0,2;
+# see xdg-extract-icons
+split_icons() {
+	xprop -id "$wid" -notype 32c _NET_WM_ICON |
+	awk -v RS=', | = ' '
+		NR == 1         { h  = $1; i++; next }
+		NR == i + 1     { x  = $1;        printf "%s = %s", h, x; next }
+		NR == i + 2     { s  = x * $1 } { printf ", %s", $1 }
+		NR == i + 2 + s { i += s + 2;     printf "\n" }
+	'
+}
+to_pam() {
+	perl -0777 -pe '@_=/\d+/g;
+	printf "P7\nWIDTH %d\nHEIGHT %d\n", splice@_,0,2;
+	printf "DEPTH 4\nMAXVAL 255\nTUPLTYPE RGB_ALPHA\nENDHDR\n";
 	$_=pack "N*", @_;
-	s/(.)(...)/$2$1/gs' |
-convert - "$dir"/"$exec".png
+	s/(.)(...)/$2$1/gs'
+}
+while read -r data; do
+	to_pam <<< "$data" |
+	convert -set 'filename:w' '%w' - "$dir"/"${exec}-%[filename:w].png"
+done < <(split_icons)
 
 cat > "$dir"/"$exec".desktop <<-DESKTOP
 	[Desktop Entry]
