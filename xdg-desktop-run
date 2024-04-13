@@ -27,6 +27,7 @@ from __future__ import print_function
 
 import sys
 from gi.repository import Gio
+# ^ See system requirements in readme.md.
 
 def usage():
 	print(__doc__, file=sys.stderr)

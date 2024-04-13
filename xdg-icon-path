@@ -19,15 +19,20 @@
 """Print chosen file path of a registered icon name for a given size"""
 from __future__ import print_function
 import sys
+use_gi = False
 if sys.version_info.major < 3:
-    import gtk
+    # import gtk
+    import gi
+    # ^ See system requirements in readme.md.
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk
+    use_gi = True
 else:
     import gi
-    # gi.require_version('Gtk', '3.0)
+    # ^ See system requirements in readme.md.
+    gi.require_version('Gtk', '3.0')
+    use_gi = True
     from gi.repository import Gtk
-    # requires
-    # - gtk-devel on fedora
-    # - libgtk-3-dev (?) on Debian-based distros such as Ubuntu
 
 try:
     icon = sys.argv[1]
@@ -41,7 +46,8 @@ try:
 except:
     size = 48
 
-if sys.version_info.major < 3:
+# if sys.version_info.major < 3:
+if not use_gi:
     icon_theme = gtk.icon_theme_get_default()
 else:
     icon_theme = Gtk.IconTheme.get_default()
