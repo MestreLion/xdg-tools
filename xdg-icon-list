@@ -27,6 +27,7 @@ def usage(ok=True):
 	sys.stderr.write("Usage: xdg-icon-list [ICONPREFIX]\n")
 	sys.exit(0 if ok else 1)
 
+
 if len(sys.argv) > 2:
 	usage(False)
 
