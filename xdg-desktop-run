@@ -17,6 +17,7 @@
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
 """Run a .desktop file, executing its application"""
+# from __future__ import print_function
 
 import sys
 from gi.repository import Gio

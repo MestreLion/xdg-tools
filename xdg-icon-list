@@ -17,6 +17,7 @@
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
 """List all regitered icon names matching an optional prefix"""
+from __future__ import print_function
 
 import sys
 import gi
@@ -42,4 +43,4 @@ if name in ('-h', '--help'):
 theme = Gtk.IconTheme.get_default()
 for icon in sorted(theme.list_icons(None)):
 	if not name or icon.startswith(name):
-		print icon
+		print(icon)

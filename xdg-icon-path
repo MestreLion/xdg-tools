@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #    Copyright (C) 2013 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
@@ -17,7 +17,7 @@
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
 """Print chosen file path of a registered icon name for a given size"""
-
+from __future__ import print_function
 import gtk, sys
 
 try:
@@ -36,6 +36,6 @@ except:
 icon_theme = gtk.icon_theme_get_default()
 icon_info = icon_theme.lookup_icon(sys.argv[1], int(size), 0)
 if icon_info:
-    print icon_info.get_filename()
+    print(icon_info.get_filename())
 else:
-    print "icon not found"
+    print("icon not found")
