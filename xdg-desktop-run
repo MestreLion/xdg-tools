@@ -16,21 +16,47 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
-"""Run a .desktop file, executing its application"""
-# from __future__ import print_function
+"""
+Run a .desktop file, executing its application
+
+Usage:
+xdg-desktop-run DESKTOP-FILE [ARGS...]
+
+"""
+from __future__ import print_function
 
 import sys
 from gi.repository import Gio
 
-if __name__ == "__main__":
+def usage():
+	print(__doc__, file=sys.stderr)
 
+def main():
+	if len(sys.argv) < 2:
+		usage()
+		print("Error: Missing DESKTOP-FILE argument.",
+			  file=sys.stderr)
+		return 1
+
+	desktop = sys.argv[1]
+	uris = sys.argv[2:]
+	msg = ""
 	try:
-		desktop = sys.argv[1]
-		uris = sys.argv[2:]
-	except:
-		sys.stderr.write("Missing DESKTOP-FILE argument.\n"
-			"Usage: xdg-desktop-run DESKTOP-FILE [ARGS...]\n")
-		sys.exit(1)
+		info = Gio.DesktopAppInfo.new_from_filename(desktop)
+	except TypeError as ex:
+		info = None
+		if "NULL" in str(ex).upper():
+			info = None
+			msg = " {}".format(ex)  # "constructor returned NULL"
+			# (such as if shortcut has no Desktop Entry section)
+		else:
+			raise
+	if not info:
+		print("Error: The shortcut appears to be invalid"
+		      " (may be missing [Desktop Entry] section)."+msg)
+		return 2
+	rc = info.launch_uris(uris, None)
+	return rc
 
-	sys.exit(Gio.DesktopAppInfo.new_from_filename(desktop).launch_uris(
-		uris, None))
+if __name__ == "__main__":
+	sys.exit(main())
