@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 #    Copyright (C) 2013 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
@@ -17,31 +17,32 @@
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
 """Print chosen file path of a registered icon name for a given size"""
-
+from __future__ import print_function
 import sys
 import gi
+# ^ See system requirements in readme.md.
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 try:
-	name = sys.argv[1]
+    name = sys.argv[1]
 except:
-	sys.stderr.write("Missing ICON argument.\n"
-	                 "Usage: xdg-icon-paths ICON\n")
-	sys.exit(1)
+    sys.stderr.write("Missing ICON argument.\n"
+                     "Usage: xdg-icon-paths ICON\n")
+    sys.exit(1)
 
 theme = Gtk.IconTheme.get_default()
 
 if not theme.has_icon(name):
-	print "icon not found"
-	sys.exit(1)
+    print("icon not found")
+    sys.exit(1)
 
 icons = []
 # theme.get_icon_sizes() is *very* buggy. Try it with gimp, firefox, etc
-for size in xrange(513):
-	icon = theme.lookup_icon(name, size, 0).get_filename()
-	if icon not in icons:
-		icons.append(icon)
+for size in range(513):
+    icon = theme.lookup_icon(name, size, 0).get_filename()
+    if icon not in icons:
+        icons.append(icon)
 
 for icon in icons:
-	print icon
+    print(icon)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 #    Copyright (C) 2013 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
@@ -17,25 +17,42 @@
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
 """Print chosen file path of a registered icon name for a given size"""
-
-import gtk, sys
+from __future__ import print_function
+import sys
+use_gi = False
+if sys.version_info.major < 3:
+    # import gtk
+    import gi
+    # ^ See system requirements in readme.md.
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk
+    use_gi = True
+else:
+    import gi
+    # ^ See system requirements in readme.md.
+    gi.require_version('Gtk', '3.0')
+    use_gi = True
+    from gi.repository import Gtk
 
 try:
-	icon = sys.argv[1]
+    icon = sys.argv[1]
 except:
-	sys.stderr.write("Missing ICON argument.\n"
-	                 "Usage: xdg-icon-path ICON [SIZE]\n")
-	sys.exit(1)
+    sys.stderr.write("Missing ICON argument.\n"
+                     "Usage: xdg-icon-path ICON [SIZE]\n")
+    sys.exit(1)
 
 try:
-	size = sys.argv[2]
+    size = sys.argv[2]
 except:
-	size = 48
+    size = 48
 
-
-icon_theme = gtk.icon_theme_get_default()
+# if sys.version_info.major < 3:
+if not use_gi:
+    icon_theme = gtk.icon_theme_get_default()
+else:
+    icon_theme = Gtk.IconTheme.get_default()
 icon_info = icon_theme.lookup_icon(sys.argv[1], int(size), 0)
 if icon_info:
-	print icon_info.get_filename()
+    print(icon_info.get_filename())
 else:
-	print "icon not found"
+    print("icon not found")
